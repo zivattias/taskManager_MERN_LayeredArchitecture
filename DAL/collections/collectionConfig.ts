@@ -37,12 +37,12 @@ export const TASKS_COLLECTION_CONFIG: CollectionConfig = {
         $jsonSchema: {
             bsonType: 'object',
             required: [
-                'type',
+                'title',
                 'isDone',
                 'user_id',
             ],
             properties: {
-                type: {
+                title: {
                     bsonType: 'string',
                     description: 'must be a string and is required',
                 },
@@ -55,8 +55,8 @@ export const TASKS_COLLECTION_CONFIG: CollectionConfig = {
                     description: 'must be a boolean and is required',
                 },
                 user_id: {
-                    bsonType: 'string',
-                    description: 'must be a string and is required',
+                    bsonType: 'objectId',
+                    description: 'must be a valid ObjectId and is required',
                 },
             },
         },

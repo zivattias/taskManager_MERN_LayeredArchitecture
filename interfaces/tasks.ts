@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export interface ITaskDisplay {
     title: string;
     description?: string;
@@ -5,5 +7,5 @@ export interface ITaskDisplay {
 }
 
 export interface ITask extends ITaskDisplay {
-    user_id: string;
+    user_id: string | ObjectId;
 }

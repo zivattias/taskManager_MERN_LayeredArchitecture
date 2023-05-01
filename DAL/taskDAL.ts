@@ -1,33 +1,52 @@
-import {ITask} from "../interfaces/tasks";
+import { ITask } from "../interfaces/tasks";
+import { db } from "../index";
+import { TASKS_COLLECTION_NAME } from "./collections/schema";
+import { ObjectId } from "mongodb";
+import { insertNewTask } from "./collections/tasks/queries";
+import { updateTask } from "./collections/tasks/queries";
+import { deleteTask } from "./collections/tasks/queries";
 
-const task1: ITask = {
-    title: "Do homework",
-    description: "Page 7",
-    isDone: false,
-    user_id: "1"
-}
-
-const task2: ITask = {
-    title: "Run",
-    isDone: false,
-    user_id: "2"
-}
-
-const tasks: ITask[] = [task1, task2];
-
-export const getTasksDAL = (user_id: string) => {
-    const userTasks: ITask[] = tasks.filter((task: ITask) => task.user_id == user_id);
-    console.log(userTasks);
-    return userTasks;
+export const getUserTasksDAL = async (user_id: string) => {
+  // TODO: toArray returns ONLY 101 first results
+  try {
+    return await db
+      .collection(TASKS_COLLECTION_NAME)
+      .find({ user_id: new ObjectId(user_id) })
+      .toArray();
+  } catch (error: any) {
+    console.error(
+      `Error getting Task with user_id=${user_id} at getUserTasksDAL()`
+    );
+    throw error;
+  }
 };
 
-export const createTaskDAL = (task: ITask) => {
-    try {
-        tasks.push(task);
-        console.log("Task has been added to the DB");
-        return true;
-    } catch (error: any) {
-        console.error(`Error inserting task: ${error.message}`)
-        return false;
-    }
+export const createTaskDAL = async (task: ITask) => {
+  try {
+    const result = await insertNewTask(task);
+    return result;
+  } catch (error: any) {
+    console.error(`Error creating Task at createTaskDAL(): ${error.stack}`);
+    throw error;
+  }
+};
+
+export const updateTaskDAL = async (task_id: string, data: Partial<ITask>) => {
+  try {
+    const result = await updateTask(task_id, data);
+    return result;
+  } catch (error: any) {
+    console.error(`Error updating Task at updateTaskDAL(): ${error.stack}`);
+    throw error;
+  }
+};
+
+export const deleteTaskDAL = async (task_id: string) => {
+  try {
+    const result = await deleteTask(task_id);
+    return result;
+  } catch (error: any) {
+    console.error(`Error deleting Task at deleteTaskDAL(): ${error.stack}`);
+    throw error;
+  }
 };
