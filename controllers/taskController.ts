@@ -18,7 +18,11 @@ import { getTask, isTaskExists } from "../DAL/collections/tasks/queries";
 export const getUserTasksController = async (req: Request, res: Response) => {
   try {
     const { user_id } = req.query;
-    if (user_id) {
+    if (
+      user_id &&
+      ObjectId.isValid(String(user_id)) &&
+      (await isUserExists(String(user_id)))
+    ) {
       const result: ITaskDisplay[] = await getUserTasksHandler(String(user_id));
       res.status(200).json({
         status: "Success",
@@ -27,7 +31,8 @@ export const getUserTasksController = async (req: Request, res: Response) => {
     } else {
       res.status(400).json({
         status: "Fail",
-        message: "user_id must be presented e.g. /tasks/<user_id>",
+        message:
+          "Invalid user_id, a valid user_id must be presented e.g. /tasks/<user_id>",
       });
     }
   } catch (error: any) {
