@@ -4,6 +4,7 @@ export const createTaskBodySchema = z.object({
   title: z.string().max(128).min(1),
   description: z.string().max(100).optional(),
   isDone: z.boolean(),
+    user_id: z.string(),
 });
 
 export const updateTaskBodySchema = z.object({
@@ -35,4 +36,15 @@ export const updateUserBodySchema = z.object({
     .optional(),
   firstName: z.string().optional(),
   password: z.string().optional(),
+});
+
+export const loginUserBodySchema = z.object({
+  email: z
+      .string()
+      .regex(
+          RegExp(
+              "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$"
+          )
+      ),
+  password: z.string(),
 });

@@ -1,5 +1,5 @@
 // Importing modules
-import express, { Express } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -11,6 +11,10 @@ import {
   USERS_COLLECTION_NAME,
 } from "./DAL/collections/schema";
 import { userRouter } from "./routers/userRouter";
+import {
+  requestUrlMiddleware,
+  validateToken,
+} from "./middlewares/generalMiddlewares";
 
 // Init Express app
 const app: Express = express();
@@ -21,8 +25,14 @@ app.use(helmet());
 app.use(compression());
 app.use(express.json());
 
-app.use("/tasks", taskRouter);
-app.use("/users", userRouter);
+app.use(requestUrlMiddleware);
+
+// Routers
+app.use("/api/users", userRouter);
+
+// Validate token MW prior to task requests:
+app.use(validateToken);
+app.use("/api/tasks", taskRouter);
 
 export let db: Db;
 
@@ -39,8 +49,8 @@ connectToDb()
   .then(async () => {
     console.log("Connected to DB successfully");
     // Launching the app
-    app.listen(3001, () => {
-      console.log("Express app is running on 3001!");
+    app.listen(8000, () => {
+      console.log("Express app is running on 8000!");
     });
     // const user1: User = {
     //     email: "user@user.com",

@@ -1,8 +1,18 @@
-import { IUser } from "../interfaces/users";
+import {IDisplayedUser, IUser, IUserLogin} from "../interfaces/users";
 import { db } from "../index";
 import { USERS_COLLECTION_NAME } from "./collections/schema";
 import { ObjectId } from "mongodb";
-import { deleteUser, insertNewUser, updateUser } from "./collections/users/queries";
+import {deleteUser, findUserByEmail, insertNewUser, updateUser} from "./collections/users/queries";
+
+
+export const loginUserDAL = async (user: IUserLogin) => {
+    try {
+        const response = await findUserByEmail(user);
+        return response;
+    } catch (error: any) {
+        console.error(`Error in loginUserDAL: ${error.message}`)
+    }
+}
 
 export const getUserDAL = async (user_id: string) => {
   try {

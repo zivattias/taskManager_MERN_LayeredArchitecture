@@ -47,17 +47,12 @@ export const getUserTasksController = async (req: Request, res: Response) => {
 export const createTaskController = async (req: Request, res: Response) => {
   try {
     const data = createTaskBodySchema.parse(req.body);
-    const { user_id } = req.query;
-
     if (
-      user_id &&
-      ObjectId.isValid(String(user_id)) &&
-      (await isUserExists(String(user_id)))
+      data.user_id &&
+      ObjectId.isValid(String(data.user_id)) &&
+      (await isUserExists(String(data.user_id)))
     ) {
-      const result = await createTaskHandler({
-        ...data,
-        user_id: String(user_id),
-      });
+      const result = await createTaskHandler(data);
       res.status(result.success ? 201 : 400).json({
         status: result.success ? "Success" : "Fail",
         message: result.success

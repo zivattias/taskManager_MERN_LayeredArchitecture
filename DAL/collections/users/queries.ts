@@ -1,7 +1,22 @@
 import { USERS_COLLECTION_NAME } from "../schema";
 import { Collection, InsertOneResult, ObjectId } from "mongodb";
 import { db } from "../../../index";
-import { IDisplayedUser, IUser } from "../../../interfaces/users";
+import {IDisplayedUser, IUser, IUserLogin} from "../../../interfaces/users";
+
+export const findUserByEmail = async (user: IUserLogin) => {
+  const { email } = user;
+  const usersCollection: Collection<IUser> = db.collection(
+      USERS_COLLECTION_NAME
+  );
+  try {
+    const result = await usersCollection.findOne({ email });
+    console.log(result);
+    return result;
+  } catch (error: any) {
+    console.error(`Error while trying to find a user by email (${email}) @ ${findUserByEmail.name}`)
+    throw Error(`Error while trying to find a user by email (${email}) @ ${findUserByEmail.name}`)
+  }
+}
 
 export const insertNewUser = async (user: IUser) => {
   const usersCollection: Collection<IUser> = db.collection(

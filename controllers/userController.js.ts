@@ -1,19 +1,20 @@
 import { Request, Response } from "express";
 import {
-  createUserBodySchema,
+  createUserBodySchema, loginUserBodySchema,
   updateUserBodySchema,
 } from "../middlewares/bodyValidations";
-import { IDisplayedUser, IUser } from "../interfaces/users";
+import {IDisplayedUser, ILoginHandlerResult, IUser, IUserLogin} from "../interfaces/users";
 import {
   createUserHandler,
   deleteUserHandler,
-  getUserHandler,
+  getUserHandler, loginUserHandler,
   updateUserHandler,
 } from "../handlers/userHandler";
 import { getUserQuerySchema } from "../middlewares/queryValidations";
 import { ZodError } from "zod";
 import { getUser } from "../DAL/collections/users/queries";
 import { ObjectId } from "mongodb";
+import {createUserDAL} from "../DAL/userDAL";
 
 export const getUserController = async (req: Request, res: Response) => {
   try {
@@ -34,6 +35,27 @@ export const getUserController = async (req: Request, res: Response) => {
   }
 };
 
+export const loginUserController = async (req: Request, res: Response)=> {
+  try {
+    const { email, password  } = loginUserBodySchema.parse(req.body);
+    const user: IUserLogin = {
+      email,
+      password,
+    };
+
+    const result: ILoginHandlerResult = await loginUserHandler(user);
+
+    res.status(result.success ? 200 : 400).json(result.success ? result : result.success);
+
+  } catch (error: any) {
+    console.error(`Error in ${loginUserController.name}: ${error.stack}`);
+    res.status(500).json({
+      status: "Internal error",
+      error: error instanceof ZodError ? error.errors : error.message,
+    });
+  }
+}
+
 export const createUserController = async (req: Request, res: Response) => {
   try {
     const body = createUserBodySchema.parse(req.body);
@@ -52,7 +74,7 @@ export const createUserController = async (req: Request, res: Response) => {
       data: result ? { email, firstName } : "Invalid data received",
     });
   } catch (error: any) {
-    console.error(`Error in createUserController: ${error.stack}`);
+    console.error(`Error in ${createUserController.name}: ${error.stack}`);
     res.status(500).json({
       status: "Data error",
       error: error instanceof ZodError ? error.errors : error.message,
